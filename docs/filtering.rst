@@ -115,6 +115,11 @@ create your own ``FilterSet``. You can pass it directly as follows:
     class AnimalFilter(django_filters.FilterSet):
         # Do case-insensitive lookups on 'name'
         name = django_filters.CharFilter(lookup_expr=['iexact'])
+        # Allow multiple genera to be selected at once
+        genera = django_filters.MultipleChoiceFilter(field_name='genus',
+                                                     choices=(('Canis', 'Canis'),
+                                                              ('Panthera', 'Panthera'),
+                                                              ('Seahorse', 'Seahorse')))
 
         class Meta:
             model = Animal
@@ -126,6 +131,23 @@ create your own ``FilterSet``. You can pass it directly as follows:
         # We specify our custom AnimalFilter using the filterset_class param
         all_animals = DjangoFilterConnectionField(AnimalNode,
                                                   filterset_class=AnimalFilter)
+
+If you were interested in selecting all dogs and cats, you might query as follows:
+
+.. code::
+
+    query {
+      allAnimals(genera: ["Canis", "Panthera"]) {
+        edges {
+          node {
+            id,
+            name
+          }
+        }
+      }
+    }
+
+
 
 You can also specify the ``FilterSet`` class using the ``filterset_class``
 parameter when defining your ``DjangoObjectType``, however, this can't be used
